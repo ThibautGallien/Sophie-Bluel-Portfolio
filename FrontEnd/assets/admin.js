@@ -9,6 +9,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let worksData = [];
 
   // =====================================
+  // Gestion du bouton logout depuis admin.html
+  // =====================================
+  const logoutLink = document.getElementById("logout-link");
+  if (logoutLink) {
+    logoutLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("token");
+      window.location.href = "index.html";
+    });
+  }
+
+  // =====================================
   // Sélection des éléments DOM principaux
   // =====================================
   const editLink = document.querySelector(".edit-link");
@@ -203,4 +215,34 @@ document.addEventListener("DOMContentLoaded", () => {
       displayModalGallery(worksData);
     })
     .catch((err) => console.error(err));
+
+  // =====================================
+  // Récupération des catégories (pour le select)
+  // =====================================
+  fetch("http://localhost:5678/api/categories")
+    .then((response) => {
+      if (!response.ok)
+        throw new Error("Erreur lors de la récupération des catégories");
+      return response.json();
+    })
+    .then((categories) => {
+      if (!categorySelect) return;
+
+      categorySelect.innerHTML = "";
+
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "Choisissez une catégorie";
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      categorySelect.appendChild(defaultOption);
+
+      categories.forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+      });
+    })
+    .catch((error) => console.error("Erreur :", error));
 });
